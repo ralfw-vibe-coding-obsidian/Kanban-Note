@@ -1,0 +1,50 @@
+name: Release Obsidian plugin
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out tagged commit
+        uses: actions/checkout@v4
+
+      - name: Build release bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          plugin_dir='.obsidian/plugins/my-vault-app'
+          manifest_version="$(jq -r '.version' "$plugin_dir/manifest.json")"
+
+          if [[ "$manifest_version" != "$GITHUB_REF_NAME" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest version $manifest_version" >&2
+            exit 1
+          fi
+
+          node --check "$plugin_dir/main.js"
+          mkdir -p dist
+          cp "$plugin_dir/main.js" dist/main.js
+          cp "$plugin_dir/manifest.json" dist/manifest.json
+          cp "$plugin_dir/styles.css" dist/styles.css
+          test -s dist/main.js
+          test -s dist/manifest.json
+          test -s dist/styles.css
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/main.js \
+            dist/manifest.json \
+            dist/styles.css \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
