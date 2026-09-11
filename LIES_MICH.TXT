@@ -1,0 +1,31 @@
+==========================================================
+  KANBAN NOTE
+==========================================================
+
+Dieses Verzeichnis ist eine Obsidian-Vault mit dem Plugin
+"Kanban Note".
+
+Oeffne den Ordner als Vault in Obsidian und erlaube dort
+Community-Plugins. Das Plugin ist bereits aktiviert.
+
+In jeder geoeffneten Markdown-Notiz erscheint oben rechts
+ein dezentes Symbol mit drei Spalten. Ein Klick darauf macht
+die Notiz zu einer Kanban Note. Bestehender Inhalt bleibt
+erhalten.
+
+Die ausfuehrliche Bedienung steht in der Notiz "Anleitung".
+
+
+----------------------------------------------------------
+Plugin neu laden
+----------------------------------------------------------
+
+Nach Aenderungen am Plugin:
+
+  Strg+P druecken (auf dem Mac Cmd+P)
+  "neu laden" tippen
+  "Anwendung neu laden ohne zu speichern" waehlen
+
+Wenn etwas nicht funktioniert, pruefe unter
+Einstellungen -> Community-Plugins, ob "Kanban Note"
+eingeschaltet ist.
