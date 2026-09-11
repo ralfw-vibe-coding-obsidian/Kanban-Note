@@ -317,6 +317,13 @@ class KanbanNoteView extends TextFileView {
   getDisplayText() { return this.file?.basename || 'Kanban Note'; }
   getIcon() { return 'columns-3'; }
 
+  async setState(state, result) {
+    await super.setState(state, result);
+    /* Der Wechsel von Markdown zum Board ist nur eine andere Darstellung
+       derselben Notiz und darf keinen zweiten Zurück-Schritt erzeugen. */
+    result.history = false;
+  }
+
   async onOpen() {
     this.addAction('file-text', 'Als Markdown anzeigen', () => this.plugin.showMarkdown(this));
     this.render();
