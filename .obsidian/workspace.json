@@ -13,10 +13,10 @@
             "state": {
               "type": "kanban-note-view",
               "state": {
-                "file": "Kleines Board test.md"
+                "file": "Kleines Board.md"
               },
               "icon": "columns-3",
-              "title": "Kleines Board test"
+              "title": "Kleines Board"
             }
           }
         ]
@@ -185,7 +185,8 @@
   },
   "active": "18f6c00efe3e9662",
   "lastOpenFiles": [
-    "Kleines Board test.md",
+    "Parent.md",
+    "Kleines Board.md",
     "Anleitung.md",
     "README.md"
   ]
