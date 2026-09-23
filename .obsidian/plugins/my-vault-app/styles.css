@@ -58,6 +58,7 @@
 .knv-empty { max-width: 440px; margin: 60px auto; padding: 24px; text-align: center; }
 .knv-empty p { color: var(--text-muted); }
 .knv-modal-fields { display: flex; flex-direction: column; gap: 10px; }
+.knv-card-modal { overflow-y: auto; overscroll-behavior: contain; scroll-padding-block: 16px 96px; }
 .knv-modal-dates { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 .knv-date-field { display: flex; align-items: center; gap: 7px; min-width: 0; }
 .knv-date-field label { flex: 0 0 auto; color: var(--text-muted); font-size: var(--font-ui-small); }
@@ -79,3 +80,12 @@
 .knv-modal-input { width: 100%; }
 .knv-modal-note { resize: vertical; }
 .knv-modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+@media (max-width: 600px) {
+  .knv-card-modal { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .knv-owner-tags-fields { flex-direction: column; }
+  .knv-owner-input { flex-basis: auto; width: 100%; }
+  .knv-tags-control { width: 100%; }
+  .knv-modal-note { min-height: 132px; }
+  .knv-modal-buttons { position: sticky; bottom: 0; z-index: 2; margin-inline: -4px; padding: 10px 4px max(4px, env(safe-area-inset-bottom)); background: var(--background-primary); }
+}

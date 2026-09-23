@@ -174,7 +174,26 @@ class CardModal extends Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.addClass('knv-card-modal');
+    this.modalEl.addClass('knv-card-modal-shell');
     contentEl.createEl('h2', { text: this.card.title ? 'Karte bearbeiten' : 'Neue Karte' });
+
+    this.modalWindow = contentEl.ownerDocument.defaultView || window;
+    this.visualViewport = this.modalWindow.visualViewport;
+    this.activeField = null;
+    this.handleFieldFocus = (event) => {
+      if (!(event.target instanceof this.modalWindow.HTMLElement)) return;
+      if (!event.target.matches('input, textarea, select')) return;
+      this.activeField = event.target;
+      this.keepActiveFieldVisible();
+    };
+    this.handleViewportChange = () => {
+      this.updateMobileModalHeight();
+      this.keepActiveFieldVisible();
+    };
+    contentEl.addEventListener('focusin', this.handleFieldFocus);
+    this.visualViewport?.addEventListener('resize', this.handleViewportChange);
+    this.visualViewport?.addEventListener('scroll', this.handleViewportChange);
+    this.updateMobileModalHeight();
 
     const fields = contentEl.createDiv({ cls: 'knv-modal-fields' });
     const title = fields.createEl('input', {
@@ -302,7 +321,35 @@ class CardModal extends Modal {
       });
   }
 
+  updateMobileModalHeight() {
+    if (!this.visualViewport) return;
+    const availableHeight = Math.max(260, this.visualViewport.height - 24);
+    this.modalEl.style.maxHeight = availableHeight + 'px';
+    this.contentEl.style.maxHeight = Math.max(210, availableHeight - 24) + 'px';
+  }
+
+  keepActiveFieldVisible() {
+    const field = this.activeField;
+    if (!field?.isConnected) return;
+    const reveal = () => {
+      const viewport = this.visualViewport;
+      const bounds = field.getBoundingClientRect();
+      const visibleTop = viewport ? viewport.offsetTop + 12 : 12;
+      const visibleBottom = viewport
+        ? viewport.offsetTop + viewport.height - 16
+        : this.modalWindow.innerHeight - 16;
+      if (bounds.top < visibleTop || bounds.bottom > visibleBottom) {
+        field.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }
+    };
+    this.modalWindow.setTimeout(reveal, 80);
+    this.modalWindow.setTimeout(reveal, 280);
+  }
+
   onClose() {
+    this.contentEl.removeEventListener('focusin', this.handleFieldFocus);
+    this.visualViewport?.removeEventListener('resize', this.handleViewportChange);
+    this.visualViewport?.removeEventListener('scroll', this.handleViewportChange);
     this.contentEl.empty();
   }
 }
