@@ -82,7 +82,8 @@
 .knv-modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 
 @media (max-width: 600px) {
-  .knv-card-modal { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .knv-card-modal-shell { display: flex; flex-direction: column; overflow: hidden; }
+  .knv-card-modal { flex: 1 1 auto; min-height: 0; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .knv-owner-tags-fields { flex-direction: column; }
   .knv-owner-input { flex-basis: auto; width: 100%; }
   .knv-tags-control { width: 100%; }

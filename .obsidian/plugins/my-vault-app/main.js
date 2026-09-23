@@ -5,6 +5,7 @@ const {
   Modal,
   Notice,
   parseYaml,
+  Platform,
   Plugin,
   setIcon,
   TextFileView
@@ -191,6 +192,7 @@ class CardModal extends Modal {
       this.keepActiveFieldVisible();
     };
     contentEl.addEventListener('focusin', this.handleFieldFocus);
+    this.modalWindow.addEventListener('resize', this.handleViewportChange);
     this.visualViewport?.addEventListener('resize', this.handleViewportChange);
     this.visualViewport?.addEventListener('scroll', this.handleViewportChange);
     this.updateMobileModalHeight();
@@ -237,7 +239,11 @@ class CardModal extends Modal {
       attr: { rows: '8', placeholder: 'Notiz', 'aria-label': 'Notiz' }
     });
     note.value = this.card.note || '';
-    note.addEventListener('input', () => { this.card.note = note.value; });
+    note.addEventListener('input', () => {
+      this.card.note = note.value;
+      this.activeField = note;
+      this.keepActiveFieldVisible();
+    });
 
     const buttons = contentEl.createDiv({ cls: 'knv-modal-buttons' });
     const cancel = buttons.createEl('button', { text: 'Abbrechen' });
@@ -322,10 +328,29 @@ class CardModal extends Modal {
   }
 
   updateMobileModalHeight() {
-    if (!this.visualViewport) return;
-    const availableHeight = Math.max(260, this.visualViewport.height - 24);
+    if (!Platform.isMobile) return;
+    const viewport = this.visualViewport;
+    const viewportHeight = viewport?.height || this.modalWindow.innerHeight;
+    const viewportTop = viewport?.offsetTop || 0;
+    const availableHeight = Math.max(260, viewportHeight - 16);
+
+    /* Mobile WebViews lassen modale Fenster teilweise hinter der Tastatur.
+       Deshalb wird nicht nur der Inhalt, sondern der ganze Dialog explizit
+       in die tatsächlich sichtbare Visual-Viewport-Fläche gesetzt. */
+    this.modalEl.style.position = 'fixed';
+    this.modalEl.style.display = 'flex';
+    this.modalEl.style.flexDirection = 'column';
+    this.modalEl.style.overflow = 'hidden';
+    this.modalEl.style.top = viewportTop + 8 + 'px';
+    this.modalEl.style.bottom = 'auto';
+    this.modalEl.style.left = '8px';
+    this.modalEl.style.right = '8px';
+    this.modalEl.style.width = 'auto';
+    this.modalEl.style.height = availableHeight + 'px';
     this.modalEl.style.maxHeight = availableHeight + 'px';
-    this.contentEl.style.maxHeight = Math.max(210, availableHeight - 24) + 'px';
+    this.modalEl.style.transform = 'none';
+    this.contentEl.style.maxHeight = 'none';
+    this.contentEl.style.height = '100%';
   }
 
   keepActiveFieldVisible() {
@@ -336,10 +361,15 @@ class CardModal extends Modal {
       const bounds = field.getBoundingClientRect();
       const visibleTop = viewport ? viewport.offsetTop + 12 : 12;
       const visibleBottom = viewport
-        ? viewport.offsetTop + viewport.height - 16
-        : this.modalWindow.innerHeight - 16;
-      if (bounds.top < visibleTop || bounds.bottom > visibleBottom) {
-        field.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+        ? viewport.offsetTop + viewport.height - 24
+        : this.modalWindow.innerHeight - 24;
+      const contentBounds = this.contentEl.getBoundingClientRect();
+      const usableBottom = Math.min(visibleBottom, contentBounds.bottom - 12);
+
+      if (bounds.bottom > usableBottom) {
+        this.contentEl.scrollTop += bounds.bottom - usableBottom + 20;
+      } else if (bounds.top < Math.max(visibleTop, contentBounds.top + 12)) {
+        this.contentEl.scrollTop -= Math.max(visibleTop, contentBounds.top + 12) - bounds.top + 12;
       }
     };
     this.modalWindow.setTimeout(reveal, 80);
@@ -348,8 +378,11 @@ class CardModal extends Modal {
 
   onClose() {
     this.contentEl.removeEventListener('focusin', this.handleFieldFocus);
+    this.modalWindow.removeEventListener('resize', this.handleViewportChange);
     this.visualViewport?.removeEventListener('resize', this.handleViewportChange);
     this.visualViewport?.removeEventListener('scroll', this.handleViewportChange);
+    this.modalEl.removeClass('knv-card-modal-shell');
+    this.modalEl.removeAttribute('style');
     this.contentEl.empty();
   }
 }
