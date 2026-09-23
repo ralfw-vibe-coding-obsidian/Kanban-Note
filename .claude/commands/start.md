@@ -12,7 +12,7 @@ Die Person kann nicht programmieren und will darüber auch nichts hören.
 
 Sieh nach, wie das Verzeichnis heißt, in dem du arbeitest.
 
-- Heißt es noch `my-vault-app`, hat die Person den Ordner nicht umbenannt.
+- Heißt es noch `kanban-note`, ist es das Plugin dieser Vault.
   Frag sie dann direkt: **"Wie soll deine App heißen?"**
 - Heißt es anders, ist das der Name. Mach daraus eine schön geschriebene Fassung
   (aus `mein-kochbuch` wird `Mein Kochbuch`) und lass sie einmal bestätigen:
@@ -23,7 +23,7 @@ später und von selbst.
 
 ## 2. Die Taufe eintragen
 
-In `.obsidian/plugins/my-vault-app/manifest.json`:
+In `.obsidian/plugins/kanban-note/manifest.json`:
 
 - `name` auf den gewählten Namen setzen.
 - `description` auf einen schlichten Satz setzen, solange noch nichts über die
@@ -31,7 +31,7 @@ In `.obsidian/plugins/my-vault-app/manifest.json`:
   der Liste der offenen Personalisierungen und wird später noch einmal angefasst.
 
 `id`, Ordnername und `.obsidian/community-plugins.json` bleiben unverändert auf
-`my-vault-app`. Das ist Absicht: jede Vault App hat ihre eigene Vault, Kollisionen
+`kanban-note`. Das ist Absicht: jede Vault App hat ihre eigene Vault, Kollisionen
 gibt es nicht, und jede Umbenennung wäre nur eine zusätzliche Fehlerquelle.
 
 Ersetze außerdem `README.md` im Wurzelverzeichnis durch eine kurze Notiz mit dem

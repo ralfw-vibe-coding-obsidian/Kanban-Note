@@ -2,7 +2,7 @@
 
 Dieses Verzeichnis ist eine **Vault App**: eine Obsidian-Vault und ein Obsidian-Plugin,
 die zusammen eine kleine Anwendung ergeben. Der Plugin-Code liegt in
-`.obsidian/plugins/my-vault-app/main.js`. Die Daten der App leben als Notizen
+`.obsidian/plugins/kanban-note/main.js`. Die Daten der App leben als Notizen
 in der Vault.
 
 `Anleitung.md` im Wurzelverzeichnis ist die Bedienungsanleitung **für die Person**.
@@ -155,6 +155,6 @@ Abgearbeitete Punkte hier abhaken. Neue Punkte, die dir auffallen, gern ergänze
 
 ## Wenn die App noch keinen Namen hat
 
-Steht in `.obsidian/plugins/my-vault-app/manifest.json` als `name` noch
+Steht in `.obsidian/plugins/kanban-note/manifest.json` als `name` noch
 `My Vault App`, ist diese Vault App frisch ausgepackt und noch nicht benannt.
 Dann ist der erste Schritt die Taufe – siehe `.claude/commands/start.md`.

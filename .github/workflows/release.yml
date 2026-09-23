@@ -20,7 +20,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          plugin_dir='.obsidian/plugins/my-vault-app'
+          plugin_dir='.obsidian/plugins/kanban-note'
           manifest_version="$(jq -r '.version' "$plugin_dir/manifest.json")"
 
           if [[ "$manifest_version" != "$GITHUB_REF_NAME" ]]; then

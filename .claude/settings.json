@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "grep -q '\"name\": \"My Vault App\"' .obsidian/plugins/my-vault-app/manifest.json 2>/dev/null && echo 'HINWEIS: Diese Vault App ist frisch ausgepackt und hat noch keinen Namen. Begruesse die Person und fuehre den Ablauf aus .claude/commands/start.md durch - ohne darauf zu warten, dass sie /start eintippt.' || true"
+            "command": "grep -q '\"name\": \"My Vault App\"' .obsidian/plugins/kanban-note/manifest.json 2>/dev/null && echo 'HINWEIS: Diese Vault App ist frisch ausgepackt und hat noch keinen Namen. Begruesse die Person und fuehre den Ablauf aus .claude/commands/start.md durch - ohne darauf zu warten, dass sie /start eintippt.' || true"
           }
         ]
       }
