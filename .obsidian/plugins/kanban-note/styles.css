@@ -41,6 +41,7 @@
 .knv-card { position: relative; padding: 11px; border: 1px solid var(--background-modifier-border); border-radius: var(--radius-m); background: var(--background-primary); box-shadow: none; cursor: pointer; }
 .knv-card:hover { border-color: var(--background-modifier-border-hover); }
 .knv-card.is-dragging { opacity: 0.45; }
+.knv-card.is-touch-dragging { -webkit-touch-callout: none; user-select: none; }
 .knv-card.is-drop-before::before, .knv-card.is-drop-after::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--interactive-accent); box-shadow: 0 0 0 1px var(--background-primary); pointer-events: none; }
 .knv-card.is-drop-before::before { top: -6px; }
 .knv-card.is-drop-after::after { bottom: -6px; }

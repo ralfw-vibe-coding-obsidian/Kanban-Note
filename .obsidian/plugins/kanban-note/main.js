@@ -422,6 +422,7 @@ class KanbanNoteView extends TextFileView {
   }
 
   render() {
+    this.cancelTouchDrag();
     const root = this.contentEl;
     root.empty();
     root.addClass('knv-view');
@@ -555,7 +556,10 @@ class KanbanNoteView extends TextFileView {
 
     board.cards.forEach((card, index) => {
       if (card.status !== status) return;
-      const cardEl = cardsEl.createDiv({ cls: 'knv-card', attr: { draggable: 'true' } });
+      const cardEl = cardsEl.createDiv({
+        cls: 'knv-card',
+        attr: { draggable: Platform.isMobile ? 'false' : 'true' }
+      });
       cardEl.dataset.cardIndex = String(index);
       cardEl.dataset.searchText = [card.title, card.owner, card.note].join(' ').toLocaleLowerCase();
       cardEl.dataset.tags = JSON.stringify(card.tags.map((tag) => tag.toLocaleLowerCase()));
@@ -627,6 +631,16 @@ class KanbanNoteView extends TextFileView {
         this.clearDropMarkers();
         window.setTimeout(() => { this.suppressCardClick = false; }, 0);
       });
+      cardEl.addEventListener('touchstart', (event) => {
+        this.beginTouchDrag(event, index, cardEl);
+      }, { passive: true });
+      cardEl.addEventListener('touchmove', (event) => {
+        this.moveTouchDrag(event);
+      }, { passive: false });
+      cardEl.addEventListener('touchend', (event) => {
+        this.finishTouchDrag(event);
+      });
+      cardEl.addEventListener('touchcancel', () => this.cancelTouchDrag());
     });
 
   }
@@ -709,6 +723,101 @@ class KanbanNoteView extends TextFileView {
       const bounds = card.getBoundingClientRect();
       return clientY < bounds.top + bounds.height / 2;
     }) || null;
+  }
+
+  beginTouchDrag(event, index, cardEl) {
+    if (!Platform.isMobile || event.touches.length !== 1) return;
+    this.cancelTouchDrag();
+    const touch = event.touches[0];
+    this.touchDrag = {
+      active: false,
+      cancelled: false,
+      index,
+      cardEl,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      target: null
+    };
+    this.touchDragTimer = window.setTimeout(() => {
+      if (!this.touchDrag || this.touchDrag.cancelled) return;
+      this.touchDrag.active = true;
+      this.suppressCardClick = true;
+      cardEl.addClass('is-dragging', 'is-touch-dragging');
+      if (navigator.vibrate) navigator.vibrate(15);
+    }, 220);
+  }
+
+  moveTouchDrag(event) {
+    const drag = this.touchDrag;
+    if (!drag || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+
+    if (!drag.active) {
+      const distance = Math.hypot(touch.clientX - drag.startX, touch.clientY - drag.startY);
+      if (distance > 10) {
+        drag.cancelled = true;
+        window.clearTimeout(this.touchDragTimer);
+      }
+      return;
+    }
+
+    event.preventDefault();
+    const document = this.contentEl.ownerDocument;
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const column = element?.closest('.knv-column:not(.is-collapsed)');
+    this.clearDropMarkers();
+    drag.target = null;
+
+    if (column && this.contentEl.contains(column)) {
+      const cardsEl = column.querySelector(':scope > .knv-cards');
+      const targetCard = this.dropTargetAt(cardsEl, touch.clientY);
+      if (targetCard) targetCard.addClass('is-drop-before');
+      else column.addClass('is-drop-at-end');
+      drag.target = {
+        status: column.dataset.status,
+        targetIndex: targetCard ? Number(targetCard.dataset.cardIndex) : null
+      };
+    }
+
+    this.autoScrollBoard(touch.clientX, touch.clientY);
+  }
+
+  finishTouchDrag(event) {
+    const drag = this.touchDrag;
+    if (!drag) return;
+    window.clearTimeout(this.touchDragTimer);
+    if (drag.active) {
+      event.preventDefault();
+      const target = drag.target;
+      this.cancelTouchDrag();
+      if (target) this.moveCard(drag.index, target.status, target.targetIndex, false);
+      window.setTimeout(() => { this.suppressCardClick = false; }, 0);
+      return;
+    }
+    this.touchDrag = null;
+  }
+
+  cancelTouchDrag() {
+    window.clearTimeout(this.touchDragTimer);
+    const wasActive = Boolean(this.touchDrag?.active);
+    if (this.touchDrag?.cardEl) {
+      this.touchDrag.cardEl.removeClass('is-dragging', 'is-touch-dragging');
+    }
+    this.clearDropMarkers();
+    this.touchDrag = null;
+    if (wasActive) window.setTimeout(() => { this.suppressCardClick = false; }, 0);
+  }
+
+  autoScrollBoard(clientX, clientY) {
+    const scroller = this.contentEl.querySelector('.knv-board-scroll');
+    if (!scroller) return;
+    const bounds = scroller.getBoundingClientRect();
+    const edge = 44;
+    const step = 18;
+    if (clientX < bounds.left + edge) scroller.scrollLeft -= step;
+    else if (clientX > bounds.right - edge) scroller.scrollLeft += step;
+    if (clientY < bounds.top + edge) scroller.scrollTop -= step;
+    else if (clientY > bounds.bottom - edge) scroller.scrollTop += step;
   }
 
   moveCard(draggedIndex, status, targetIndex, after) {
